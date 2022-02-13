@@ -38,19 +38,16 @@ starnge = (102,58,255)
 
 ## list of the x,y angle
 x_y_coordinate = {}
-start_angle = 60
-end_angle = 180
+start_angle_l = 60
+end_angle_l = 180
 
 class core_processing:
-
-    
 
     def cal_draw_location(self,img,angle,range):
 
         global x_y_coordinate
         global start_x
         global start_y
-
         global end_x
         global end_y
 
@@ -102,8 +99,7 @@ class core_processing:
         distance = area/AB
         return distance
 
-
-    def callback(self,data):
+    def left(self,data,black_img):
         global start_angle
         global end_angle
         global x_y_coordinate
@@ -112,7 +108,6 @@ class core_processing:
         global end_x
         global end_y
         ##initialize all data
-        black_img = np.zeros(shape=[720,720,3],dtype=np.uint8)
         x_y_coordinate = {}
         start_x = 0 
         start_y = 0
@@ -121,6 +116,61 @@ class core_processing:
 
         #for i in range(70,180):
         for i in range(60,180):
+            ranges = data.ranges[i]
+            self.cal_draw_location(black_img,i,ranges)
+        #print(x_y_coordinate['70'][0],x_y_coordinate['70'][1])
+
+        #self.draw_line(black_img,x_y_coordinate['70'],x_y_coordinate['179'])
+        
+        max_dist = 0
+        max_index = 0
+
+        x1 = x_y_coordinate[str(start_angle_l)][0]
+        y1 = x_y_coordinate[str(start_angle_l)][1]
+
+        x2 = x_y_coordinate[str(end_angle_l-1)][0]
+        y2 = x_y_coordinate[str(end_angle_l-1)][1]
+
+        self.draw_lidar_point(black_img,x1,y1,5,white)
+        self.draw_lidar_point(black_img,x2,y2,5,green)
+
+        for j in range(70,180):
+            a = x_y_coordinate[str(j)][0]
+            b = x_y_coordinate[str(j)][1] 
+            dist = self.cal_dist(x1,y1,x2,y2,a,b)
+            if(dist > max_dist and a != 0 ):
+
+                max_dist = dist
+                max_index = j
+            print(max_index)
+
+        #print(max_index)
+        x3 = x_y_coordinate[str(max_index)][0]
+        y3 = x_y_coordinate[str(max_index)][1]
+        
+        self.draw_lidar_point(black_img,x3,y3,5,starnge)
+
+        self.draw_line(black_img,x_y_coordinate[str(start_angle_l)],x_y_coordinate[str(max_index)])
+        self.draw_line(black_img,x_y_coordinate[str(max_index)],x_y_coordinate[str(end_angle_l-1)])
+
+    def right(self,data,black_img):
+
+        global start_angle
+        global end_angle
+        global x_y_coordinate
+        global start_x
+        global start_y
+        global end_x
+        global end_y
+        ##initialize all data
+        x_y_coordinate = {}
+        start_x = 0 
+        start_y = 0
+        end_x = 0
+        end_y = 0
+
+        #for i in range(70,180):
+        for i in range(540,660):
             ranges = data.ranges[i]
             self.cal_draw_location(black_img,i,ranges)
         #print(x_y_coordinate['70'][0],x_y_coordinate['70'][1])
@@ -159,6 +209,9 @@ class core_processing:
         self.draw_line(black_img,x_y_coordinate[str(max_index)],x_y_coordinate[str(end_angle-1)])
 
 
+    def callback(self,data):
+        black_img = np.zeros(shape=[720,720,3],dtype=np.uint8)
+        self.left(data,black_img)
 
         cv2.imshow("black",black_img)
         cv2.waitKey(1)
