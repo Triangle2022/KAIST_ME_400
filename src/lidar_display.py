@@ -10,6 +10,7 @@ import math
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import String
 from std_msgs.msg import Int32
+from std_msgs.msg import Float32
 
 ## image size setting
 x_size = 1080
@@ -42,11 +43,14 @@ end_angle_l = 270
 start_angle_r = 540
 end_angle_r = 660
 
+dir = 0
+
 class core_processing:
 
     def __init__(self):
 
         self.image_sub = rospy.Subscriber("scan",LaserScan,self.callback) #original image subscriber
+        self.imu_sub = rospy.Subscriber("compass",Float32,self.callback2)
 
         self.front = rospy.Publisher('front_motor',Int32,queue_size=10)
         self.rear = rospy.Publisher('rear_motor',Int32,queue_size=10)
@@ -189,6 +193,9 @@ class core_processing:
         self.make_point_and_line(data,black_img,1146-270,1146) #This value must be clock wise -> draw right line
 
         
+        
+        ###
+        
 
         cv2.imshow("black",black_img)
         cv2.waitKey(1)
@@ -212,6 +219,11 @@ class core_processing:
         self.rear.publish(rear_motor)
         self.front.publish(front_motor)
         self.servo.publish(servo_angle)
+
+    def callback2(self,data):
+        global dir
+        dir = data.data
+        pass
 
 def main(args):
     cp = core_processing()
