@@ -185,8 +185,8 @@ class core_processing:
 
         # the 0-360 scale is 0-1146
 
-        self.make_point_and_line(data,black_img,60,270) #This value must be clock wise
-        self.make_point_and_line(data,black_img,1146-270,1146) #This value must be clock wise
+        self.make_point_and_line(data,black_img,60,270) #This value must be clock wise -> draw left line
+        self.make_point_and_line(data,black_img,1146-270,1146) #This value must be clock wise -> draw right line
 
         
 
